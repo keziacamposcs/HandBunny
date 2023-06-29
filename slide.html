@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="icon" type="image/png" href="images/bunny.png" sizes="32x32">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema HandBunny</title>
+    <!-- CSS-->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+
+    <!-- Fim - CSS-->
+  </head>
+  <body style="background-color: #efefef;">
+    <!--Menu-->
+    <div class="container">
+      <header class="d-flex justify-content-center py-3 my-4">
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a href="index.html" class="nav-link " aria-current="page">Página Inicial</a></li>
+            <li class="nav-item"><a href="como_funciona.html" class="nav-link ">Como funciona</a></li>
+            <li class="nav-item"><a href="slide.html" class="nav-link active">Apresentação Inteligente</a></li>
+            <li class="nav-item"><a href="desenho.html" class="nav-link">Desenho Inteligente</a></li>
+          </ul>
+        </header>
+    </div>
+    <!-- Fim - Menu-->
+
+    <div class="container text-center">
+      <div class="row">
+
+
+      <!-- Coluna 1 Slide-->
+        <div class="col-sm-8">
+          <div class="card">
+            <h5 class="card-header">Apresentação <span class="badge bg-secondary">PDF somente</span></h5>
+
+            
+            <div class="card-body">
+
+              
+              <div class="card-body">
+                <div class="input-group">
+                  <input type="file" class="form-control" id="inputGroupFile" aria-label="Carregar">
+                </div>
+              </div>
+
+              <div>
+                <button class="btn btn-primary" id="prev">Anterior</button>
+                <button class="btn btn-primary" id="next">Próximo</button>
+                <span>Página: <span id="page_num"></span> / <span id="page_count"></span></span>
+              </div>
+              <br>
+
+              <div id="viewerContainer" style="width: 100%; height: 100%;">
+                <div id="viewer" class="pdfViewer"></div>
+              </div>
+              
+              <canvas id="the-canvas"></canvas>
+        
+
+            </div>
+          </div>
+        </div>
+      <!-- Fim - Coluna 1 Slide-->
+
+      <!-- Coluna 2 Cameras-->
+        <div class="col-sm-4">
+          <div class="card text-center mb-3">
+            <h5 class="card-header">WebCam</h5>
+            <div class="card-body">
+
+              <!--Camera webcam-->
+                <div class="row">       
+                  <video class="input_video"style="width: 100%; height: 100%; display:none"></video>
+                </div>
+              <!--Fim - Camera webcam-->
+
+              <!--Output com sinais-->
+                <div class="row">       
+                    <canvas class="output_canvas" style="display: flex; justify-content: center; align-items: center;"></canvas>
+                    <div class="caption">Direção do dedo: <span id="finger-direction"></span></div>
+                </div>
+              <!--Fim - Output com sinais-->
+
+            </div>
+          </div>
+        </div>
+      <!-- Fim - Coluna 2 Cameras-->
+
+
+      </div>
+    </div>
+<!-- Javascript-->
+    <!-- Mediapipe-->
+      <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap-->
+      <script src="js/bootstrap.min.js" integrity="sha384-3oE51fG8R+q4yjzUHnlgUvVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7TxaGv6f1" crossorigin="anonymous"></script>
+
+      <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+      <script src="js/slide/slide.js"></script>
+      
+    </body>
+</html>
