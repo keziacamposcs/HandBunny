@@ -16,7 +16,7 @@ function onResults(results)
         for (const landmarks of results.multiHandLandmarks)
         {
             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,  {color: '#F1FAEE', lineWidth: 3}  );
-            drawLandmarks(canvasCtx, landmarks, {color: '#E63946', lineWidth: 1});
+            drawLandmarks(canvasCtx, landmarks, {color: '#9F3B25', lineWidth: 1});
 
             // verifica a direção do dedo indicador
             const direction = checkFingerDirection(landmarks);
