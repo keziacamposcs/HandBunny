@@ -1,107 +1,178 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="icon" type="image/png" href="images/bunny.png" sizes="32x32">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sistema HandBunny</title>
-    <!-- CSS-->
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <!-- Fim - CSS-->
-  </head>
-  <body style="background-color: #efefef;">
-    <!--Menu-->
-    <div class="container">
-      <header class="d-flex justify-content-center py-3 my-4">
-        <ul class="nav nav-pills">
-            <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page">Página Inicial</a></li>
+    <head>
+        <link rel="icon" type="image/png" href="images/bunny.png" sizes="32x32">
 
-            <li class="nav-item"><a href="como_funciona.html" class="nav-link">Como funciona</a></li>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>HandBunny</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Google fonts-->
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+            <div class="container px-5">
+                <a class="navbar-brand fw-bold" href="#page-top">HandBunny</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="bi-list"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
+                        <li class="nav-item"><a class="nav-link me-lg-3" href="slide.html">Apresentação Inteligente</a></li>
+                        <li class="nav-item"><a class="nav-link me-lg-3" href="desenho.html">Desenho Inteligente</a></li>
+                    </ul>
+                    <a class="btn btn-primary  px-3 mb-2 mb-lg-0" data-bs-toggle="modal" data-bs-target="#feedbackModal" href="https://forms.gle/H8C5GuPQWMAmDzQ56">
+                        <span class="d-flex align-items-center">
+                            <i class="bi-chat-text-fill me-2"></i>
+                            <span class="small">Envie seu Feedback</span>
+                        </span>
+                    </a>
+                    &nbsp;&nbsp;
+                    <a class="btn btn-outline-secondary" href="https://github.com/keziacamposcs/HandBunny"> <i class="bi bi-github"></i> &nbsp; GitHub</a>
+                </div>
+            </div>
+        </nav>
+        <!-- Mashead header-->
+        <header class="masthead">
+            <div class="container px-5">
+                <div class="row gx-5 align-items-center">
+                    <div class="col-lg-6">
+                        <!-- Mashead text and app badges-->
+                        <div class="mb-5 mb-lg-0 text-center text-lg-start">
+                            <img src="images/handbunny.gif" width="500px">
+                            <div class="d-flex flex-column flex-lg-row align-items-center">
+                                <a href="" class="btn btn-primary"><i class="bi bi-windows"></i> Download para Microsoft</a> &nbsp;&nbsp;
+                                <a class="btn btn-primary"><i class="bi bi-apple"></i> Download para MacOS</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="images/hand.gif" width="500px">
 
-            <li class="nav-item"><a href="slide.html" class="nav-link">Apresentação Inteligente</a></li>
-            <li class="nav-item"><a href="desenho.html" class="nav-link">Desenho Inteligente</a></li>
-          </ul>
+                        
+                    </div>
+                </div>
+            </div>
         </header>
-    </div>
-    <!-- Fim - Menu-->
-    <div class="container col-xxl-8 px-4 py-1">
-      <div class="row flex-lg-row-reverse align-items-center g-5 py-4">
-        <div class="col-10 col-sm-8 col-lg-6">
-          <img src="images/Thank.gif" class="d-block mx-lg-auto img-fluid" width="700" height="500" loading="lazy">
-        </div>
-        <div class="col-lg-6">
-          <h1 class="display-5 fw-bold  text-body-emphasis lh-1 mb-3">HandBunny</h1>
-          <h4>Sistema de Apresentação Inteligente</h4>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-start text-center">
-            <a class="btn btn-primary" href="https://github.com/handbunny">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-              </svg> GitHub
-            </a>
-          </div>
-          
-        </div>
-      </div>
-    </div>
-
-    <div  style="background-color: #1D3557;width: 100vw;">
-      <div class="row justify-content-center" style="padding: 20px;">
-        <h1 class="display-5 fw-bold" style="text-align: center; color: #EF233C;">Downloads</h1>
-
-        <div class="col-sm-3 text-center" >
-          <div class="card" style="width: 18rem; margin:auto;">
-            <div class="card-body">
-              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-windows" viewBox="0 0 16 16">
-                <path d="M6.555 1.375 0 2.237v5.45h6.555V1.375zM0 13.795l6.555.933V8.313H0v5.482zm7.278-5.4.026 6.378L16 16V8.395H7.278zM16 0 7.33 1.244v6.414H16V0z"/>
-              </svg>
-              <h3 class="card-title">
-                Para Windows
-              </h3>
-              <a href="#" class="btn btn-primary">Download</a>
+        <!-- Quote/testimonial aside-->
+        <aside class="text-center bg-gradient-primary-to-secondary">
+            <div class="container px-5">
+                <div class="row gx-5 justify-content-center">
+                    <div class="col-xl-8">
+                        <div class="h3 text-white">"Desbloqueie seu poder de expressão: deixe suas mãos guiar o caminho para uma apresentação memorável!"</div>
+                        <div class="text-white h6"> Versão 1.0</div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
+        </aside>
 
-        <div class="col-sm-3 text-center">
-          <div class="card " style="width: 18rem;margin:auto;">
-            <div class="card-body">
-              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-apple" viewBox="0 0 16 16">
-                <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282Z"/>
-              </svg>
-              <h3 class="card-title">
-                Para macOS
-              </h3>
-              <a href="#" class="btn btn-primary">Download</a>
+        <section id="features">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6">
+                            <h2><i class="bi bi-play-btn"></i> &nbsp; Como usar: Apresentação Inteligente</h2>
+                            <p class="fs-5 col-md-8">Para a utilização da <b>Apresentação Inteligente</b>, precisa seguir os seguintes passos:</p>
+                                    
+                            <div class="row justify-content-center" style="padding: 20px;">
+                                <div class="col-6" >
+                                    <p class="fs-5 col-md-8">1. Autorizar a permissão da câmera de webcam para a utilização</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <img src="images/como_funciona/permissao1.gif" class="img-fluid"  width="400">
+                                </div>
+                            </div>
+
+                            <div class="row justify-content-center" style="padding: 20px;">
+                                <div class="col-6" >
+                                    <p class="fs-5 col-md-8">2. Fazer o upload da Apresentação que deseja apresentar</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <img src="images/como_funciona/escolher_arquivo1.gif" class="img-fluid"  width="400">
+                                </div>
+                            </div>
+                                    
+                            <div class="row justify-content-center" style="padding: 20px;">
+                                <div class="col-6" >
+                                    <p class="fs-5 col-md-8">3. Garanta que a sua webcam esteja com a sua mão no campo de visão da câmera</p>
+                                    <p>A câmera reconhece propositalmente 1 mão por vez</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <img src="images/como_funciona/slide2.png" class="img-fluid"  width="400">
+                                </div>
+                            </div>
+                            <hr>
+                                    
+                            <div class="row justify-content-center" style="padding: 20px;">
+                                <p class="fs-5 col-md-8">Os comandos da <b>Apresentação Inteligente</b> são os seguintes:</p>
+                                <div class="col-6">
+                                    <img src="images/como_funciona/slide1.png" class="img-fluid"  width="400">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <img src="images/como_funciona/zoom.gif" class="img-fluid"  width="400">
+                                </div>
+                            </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h2><i class="bi bi-brush"></i> &nbsp; Como usar: Desenho Inteligente</h2>
+
+                        <p class="fs-5 col-md-8">Para a utilização da <b>Desenho Inteligente</b>, precisa seguir os seguintes passos:</p>
+                  
+                        <div class="row justify-content-center" style="padding: 20px;">
+                          <div class="col-6" >
+                            <p class="fs-5 col-md-8">1. Autorizar a permissão da câmera de webcam para a utilização</p>
+                          </div>
+                          <div class="col-6 text-center">
+                            <img src="images/como_funciona/permissao1.gif" class="img-fluid"  width="400">
+                          </div>
+                        </div>
+                  
+                        <div class="row justify-content-center" style="padding: 20px;">
+                          <div class="col-6" >
+                            <p class="fs-5 col-md-8">2. Garanta que a sua webcam esteja com a sua mão no campo de visão da câmera</p>
+                            <p>A câmera reconhece propositalmente 1 mão por vez</p>
+                          </div>
+                          <div class="col-6 text-center">
+                            <img src="images/como_funciona/slide2.png" class="img-fluid"  width="400">
+                          </div>
+                        </div>
+                  
+                        <div class="row justify-content-center" style="padding: 20px;">
+                          <div class="col-6 " >
+                            <li class="fs-5">O <b>pincel</b> é a ponta do dedo indicador</li>
+                            <li class="fs-5">O punho fechado é para <b>apagar</b> o desenho</li>
+                          </div>
+                          <div class="col-6 text-center">
+                            <img src="images/como_funciona/slide3.png" class="img-fluid"  width="400">
+                          </div>
+                        </div>            
+                    </div>
+                </div>
+
             </div>
-          </div>
-        </div>
+        </section>
 
-        <div class="col-sm-6 text-center">
-          <div class="image-container" style="height: 300px; margin-top: -150px;">
-            <img src="images/bunny.png" class="d-block mx-lg-auto img-fluid" width="250" height="500" loading="lazy">
-          </div>
-        </div>
-        
+        <footer class="bg-primary text-center py-5">
+            <div class="container px-5">
+                <div class="text-white-50 small">
+                    <div class="mb-2">&copy; HandBunny 2023. Projeto de TCC - FEMASS Macaé-RJ.</div>
+                </div>
+            </div>
+        </footer>
 
-
-      </div>
-    </div>
-
-    <div class="container">
-      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-        <div class="col-md-4 d-flex align-items-center">
-          <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
-            <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
-          </a>
-          <span class="mb-3 mb-md-0 text-body-secondary">© 2023 HandBunny - Sistema de Apresentação Inteligente </span>
-        </div>
-
-      </footer>
-    </div>
-    <!-- Javascript-->
-    <script src="js/bootstrap/bootstrap.min.js" integrity="sha384-3oE51fG8R+q4yjzUHnlgUvVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7TxaGv6f1" crossorigin="anonymous"></script>
-    
-    <!-- Fim - Javascript-->
-
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/scripts.js"></script>
     </body>
 </html>
