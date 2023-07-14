@@ -20,6 +20,7 @@ function drawHandLandmarks(results, ctx) {
   }
 }
 
+
 function limpar() {
   var canvas = document.getElementById("quadro");
   var ctx = canvas.getContext("2d");
@@ -27,25 +28,42 @@ function limpar() {
 }
 
 // Função que processa os resultados da detecção de mãos
-function onResults(results)
-{
+function onResults(results) {
   canvasCtx.save();
+
   // Limpa o canvas
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
   // Desenha a imagem da câmera no canvas
-  canvasCtx.drawImage( results.image, 0, 0, canvasElement.width, canvasElement.height );
-  if (results.multiHandLandmarks)
-    {
-      for (const landmarks of results.multiHandLandmarks)
-      {
-        drawLandmarks(canvasCtx, [landmarks[8]], {color: '#E63946', lineWidth: 1});
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+  if (results.multiHandLandmarks) {
+    for (const landmarks of results.multiHandLandmarks) {
+      drawLandmarks(canvasCtx, [landmarks[8]], {color: '#E63946', lineWidth: 1});
+      const indexFinger = landmarks[8]; // seleciona a ponta do dedo indicador (landmark 8)
+      const handOpen = indexFinger.y < landmarks[5].y; // verifica se o dedo indicador está abaixo do dedo médio (landmark 5)
+
+      if (handOpen) {
+        // Mão aberta (pincel)
+        ctx.strokeStyle = '#1D3557'; //cor do pincel
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+      } else {
+        // Mão fechada (apagador)
+        ctx.strokeStyle = '#f5f5f5'; //cor do apagador
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round'; 
       }
+
+      ctx.beginPath();
+      ctx.moveTo(indexFinger.x * canvasQuadro.width, indexFinger.y * canvasQuadro.height);
+      ctx.lineTo(landmarks[7].x * canvasQuadro.width, landmarks[7].y * canvasQuadro.height);
+      ctx.stroke();
     }
-  // Desenha as landmarks das mãos no canvasQuadro
-  drawHandLandmarks(results, canvasQuadro.getContext('2d'));
-  
+  }
+
   canvasCtx.restore();
 }
+
 
 canvasQuadro.addEventListener("mouseup", function(evt) {
   desenhando = true;
