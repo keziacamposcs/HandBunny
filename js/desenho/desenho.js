@@ -44,7 +44,7 @@ function onResults(results) {
 
       if (handOpen) {
         // Mão aberta (pincel)
-        ctx.strokeStyle = '#1D3557'; //cor do pincel
+        ctx.strokeStyle = '#3B89C8'; //cor do pincel
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
       } else {
