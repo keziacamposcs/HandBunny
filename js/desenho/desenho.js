@@ -14,7 +14,7 @@ function drawHandLandmarks(results, ctx) {
       const landmark = landmarks[4]; // seleciona a ponta do dedo indicador (landmark 4)
       ctx.beginPath();
       ctx.arc(landmark.x * canvasQuadro.width, landmark.y * canvasQuadro.height, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = '#1D3557';
+      ctx.fillStyle = '#1B335F';
       ctx.fill();
     }
   }
@@ -38,13 +38,13 @@ function onResults(results) {
   canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
   if (results.multiHandLandmarks) {
     for (const landmarks of results.multiHandLandmarks) {
-      drawLandmarks(canvasCtx, [landmarks[8]], {color: '#3B89C8', lineWidth: 1});
+      drawLandmarks(canvasCtx, [landmarks[8]], {color: '#9F3B25', lineWidth: 1});
       const indexFinger = landmarks[8]; // seleciona a ponta do dedo indicador (landmark 8)
       const handOpen = indexFinger.y < landmarks[5].y; // verifica se o dedo indicador está abaixo do dedo médio (landmark 5)
 
       if (handOpen) {
         // Mão aberta (pincel)
-        ctx.strokeStyle = '#3B89C8'; //cor do pincel
+        ctx.strokeStyle = '#1B335F'; //cor do pincel
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
       } else {
