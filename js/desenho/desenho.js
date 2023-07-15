@@ -38,7 +38,7 @@ function onResults(results) {
   canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
   if (results.multiHandLandmarks) {
     for (const landmarks of results.multiHandLandmarks) {
-      drawLandmarks(canvasCtx, [landmarks[8]], {color: '#E63946', lineWidth: 1});
+      drawLandmarks(canvasCtx, [landmarks[8]], {color: '#3B89C8', lineWidth: 1});
       const indexFinger = landmarks[8]; // seleciona a ponta do dedo indicador (landmark 8)
       const handOpen = indexFinger.y < landmarks[5].y; // verifica se o dedo indicador está abaixo do dedo médio (landmark 5)
 
