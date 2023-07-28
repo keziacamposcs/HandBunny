@@ -53,14 +53,20 @@
           <div class="col-sm-8">
             <div class="card">
               <h5 class="card-header">Apresentação <span class="badge bg-secondary">PDF somente</span></h5>
-
+              
+            
               
               <div class="card-body">
 
                 
                 <div class="card-body">
                   <div class="input-group">
-                    <input type="file" class="form-control" id="inputGroupFile" aria-label="Carregar">
+                    <input type="file" class="form-control" id="inputGroupFile" accept=".pdf,.pptx,.key" aria-label="Carregar">
+                    <select id="fileType" class="form-select">
+                        <option selected value="pdf">PDF</option>
+                        <option value="pptx">PPTX</option>
+                        <option value="key">Keynote</option>
+                    </select>
                   </div>
                 </div>
 
