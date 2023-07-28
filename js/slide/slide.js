@@ -162,105 +162,35 @@ document.getElementById('next').addEventListener('click', onNextPage);
 // Fim - Função que muda para a proxima página
 
 //Carrega o slide
-/*
-document.getElementById('inputGroupFile').addEventListener('change', function()
-{
+document.getElementById('inputGroupFile').addEventListener('change', function () {
   var file = this.files[0];
   var fileReader = new FileReader();
-  fileReader.onload = function()
-  {
+  fileReader.onload = function () {
     var typedarray = new Uint8Array(this.result);
-    pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
-    {
+    pdfjsLib.getDocument(typedarray).promise.then(function (pdfDoc_) {
       pdfDoc = pdfDoc_;
       document.getElementById('page_count').textContent = pdfDoc.numPages;
       renderPage(pageNum);
     });
+
+    // Embed the PowerPoint file using the Microsoft API
+    var fileType = document.getElementById('fileType').value;
+    var iframeContainer = document.getElementById('viewerContainer');
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('src', 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/' + file.name));
+    iframe.setAttribute('width', '100%');
+    iframe.setAttribute('height', '565px');
+    iframe.setAttribute('frameborder', '0');
+
+    // Remove any previously embedded iframes
+    while (iframeContainer.firstChild) {
+      iframeContainer.removeChild(iframeContainer.firstChild);
+    }
+
+    // Append the new iframe
+    iframeContainer.appendChild(iframe);
   };
   fileReader.readAsArrayBuffer(file);
-});
-*/
-
-
-document.getElementById('inputGroupFile').addEventListener('change', function()
-{
-    var file = this.files[0];
-    var fileType = document.getElementById('fileType').value;
-    var fileReader = new FileReader();
-
-    if (fileType === 'pdf') 
-    {
-        fileReader.onload = function()
-        {
-            var typedarray = new Uint8Array(this.result);
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
-            {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page_count').textContent = pdfDoc.numPages;
-                renderPage(pageNum);
-            });
-        };
-        fileReader.readAsArrayBuffer(file);
-    } 
-    else if (fileType === 'pptx' || fileType === 'key') 
-    {
-        var apiKey = '93678e85ce33cf499b488195f92034e7af717986';
-        var formData = new FormData();
-
-        formData.append('source_file', file);
-        formData.append('target_format', 'pdf');
-
-        // Iniciar a conversão de arquivo
-        fetch('https://sandbox.zamzar.com/v1/jobs', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Basic ' + btoa(apiKey + ':')
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Armazena o ID do job para uso posterior
-            var jobId = data.id;
-
-            // Verificar o status do job a cada 5 segundos até que a conversão esteja concluída
-            var checkJobStatus = setInterval(function() {
-                fetch('https://sandbox.zamzar.com/v1/jobs/' + jobId, {
-                    headers: {
-                        'Authorization': 'Basic ' + btoa(apiKey + ':')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'successful') {
-                        clearInterval(checkJobStatus);
-
-                        // Baixar o arquivo convertido
-                        var fileId = data.target_files[0].id;
-                        fetch('https://sandbox.zamzar.com/v1/files/' + fileId + '/content', {
-                            headers: {
-                                'Authorization': 'Basic ' + btoa(apiKey + ':')
-                            }
-                        })
-                        .then(response => response.blob())
-                        .then(blob => {
-                            var reader = new FileReader();
-                            reader.onload = function() {
-                                var typedarray = new Uint8Array(this.result);
-                                pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
-                                {
-                                    pdfDoc = pdfDoc_;
-                                    document.getElementById('page_count').textContent = pdfDoc.numPages;
-                                    renderPage(pageNum);
-                                });
-                            };
-                            reader.readAsArrayBuffer(blob);
-                        });
-                    }
-                });
-            }, 5000);
-        });
-    }
 });
 
 
