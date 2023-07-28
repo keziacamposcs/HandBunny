@@ -162,36 +162,31 @@ document.getElementById('next').addEventListener('click', onNextPage);
 // Fim - Função que muda para a proxima página
 
 //Carrega o slide
-document.getElementById('inputGroupFile').addEventListener('change', function () {
+document.getElementById('inputGroupFile').addEventListener('change', function()
+{
   var file = this.files[0];
-  var fileReader = new FileReader();
-  fileReader.onload = function () {
-    var typedarray = new Uint8Array(this.result);
-    pdfjsLib.getDocument(typedarray).promise.then(function (pdfDoc_) {
-      pdfDoc = pdfDoc_;
-      document.getElementById('page_count').textContent = pdfDoc.numPages;
-      renderPage(pageNum);
-    });
-
-    // Embed the PowerPoint file using the Microsoft API
-    var fileType = document.getElementById('fileType').value;
-    var iframeContainer = document.getElementById('viewerContainer');
-    var iframe = document.createElement('iframe');
-    iframe.setAttribute('src', 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(window.location.origin + '/' + file.name));
-    iframe.setAttribute('width', '100%');
-    iframe.setAttribute('height', '565px');
-    iframe.setAttribute('frameborder', '0');
-
-    // Remove any previously embedded iframes
-    while (iframeContainer.firstChild) {
-      iframeContainer.removeChild(iframeContainer.firstChild);
-    }
-
-    // Append the new iframe
-    iframeContainer.appendChild(iframe);
-  };
-  fileReader.readAsArrayBuffer(file);
+  var fileType = document.getElementById('fileType').value;
+  
+  if (fileType === 'pptx') {
+    var publicUrl = 'https://keziacamposcs.github.io/HandBunny/' + file.name; // Substitua pelo caminho relativo correto
+    document.getElementById('viewer').src = 'https://view.officeapps.live.com/op/embed.aspx?src=' + publicUrl;
+  } else {
+    var fileReader = new FileReader();
+    fileReader.onload = function()
+    {
+      var typedarray = new Uint8Array(this.result);
+      pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
+      {
+        pdfDoc = pdfDoc_;
+        document.getElementById('page_count').textContent = pdfDoc.numPages;
+        renderPage(pageNum);
+      });
+    };
+    fileReader.readAsArrayBuffer(file);
+  }
 });
+
+
 
 
 
