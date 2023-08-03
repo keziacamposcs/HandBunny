@@ -16,7 +16,7 @@ function onResults(results)
         for (const landmarks of results.multiHandLandmarks)
         {
             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,  {color: '#F1FAEE', lineWidth: 3}  );
-            drawLandmarks(canvasCtx, landmarks, {color: '#F26D4F', lineWidth: 1});
+            drawLandmarks(canvasCtx, landmarks, {color: '#E63946', lineWidth: 1});
 
             // verifica a direção do dedo indicador
             const direction = checkFingerDirection(landmarks);
@@ -162,7 +162,6 @@ document.getElementById('next').addEventListener('click', onNextPage);
 // Fim - Função que muda para a proxima página
 
 //Carrega o slide
-/*
 document.getElementById('inputGroupFile').addEventListener('change', function()
 {
   var file = this.files[0];
@@ -178,60 +177,6 @@ document.getElementById('inputGroupFile').addEventListener('change', function()
     });
   };
   fileReader.readAsArrayBuffer(file);
-});
-*/
-document.getElementById('inputGroupFile').addEventListener('change', function()
-{
-  var file = this.files[0];
-  var fileType = document.getElementById('fileType').value;
-  var fileReader = new FileReader();
-
-  if (fileType === 'pdf') 
-  {
-    fileReader.onload = function()
-    {
-      var typedarray = new Uint8Array(this.result);
-      pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
-      {
-        pdfDoc = pdfDoc_;
-        document.getElementById('page_count').textContent = pdfDoc.numPages;
-        renderPage(pageNum);
-      });
-    };
-    fileReader.readAsArrayBuffer(file);
-  } 
-  else if (fileType === 'pptx' || fileType === 'key') 
-  {
-    // Se for PPTX ou KEY, fazemos a conversão para PDF usando CloudConvert
-    var apiKey = 'sua-chave-api';
-    var outputFormat = 'pdf';
-    var formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('apikey', apiKey);
-    formData.append('inputformat', fileType);
-    formData.append('outputformat', outputFormat);
-
-    fetch('https://api.cloudconvert.com/convert', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.blob())  // Convert the response to a blob
-    .then(blob => {
-        // Aqui, você carrega o arquivo PDF convertido para o visualizador
-        var reader = new FileReader();
-        reader.onload = function() {
-            var typedarray = new Uint8Array(this.result);
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
-            {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page_count').textContent = pdfDoc.numPages;
-                renderPage(pageNum);
-            });
-        };
-        reader.readAsArrayBuffer(blob);
-    });
-  }
 });
 
 
