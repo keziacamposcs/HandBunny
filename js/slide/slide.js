@@ -95,16 +95,59 @@ const GestureModule = (() => {
 // Módulo de Slides (PDF)
 // =========================
 const SlideModule = (() => {
-    let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null;
+    let pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null;
+    const canvas = document.getElementById('the-canvas');
+    const context = canvas.getContext('2d');
 
-    function renderPage(num) { /*...*/ }
-    function queueRenderPage(num) { /*...*/ }
+    function renderPage(num) {
+        pageRendering = true;
+        
+        pdfDoc.getPage(num).then(page => {
+            const viewport = page.getViewport({ scale: currentScale });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+
+            const renderTask = page.render(renderContext);
+
+            renderTask.promise.then(() => {
+                pageRendering = false;
+                if (pageNumPending !== null) {
+                    renderPage(pageNumPending);
+                    pageNumPending = null;
+                }
+            });
+        });
+    }
+
+    function queueRenderPage(num) {
+        if (pageRendering) {
+            pageNumPending = num;
+        } else {
+            renderPage(num);
+        }
+    }
+
+    function onDocumentLoaded(_pdfDoc) {
+        pdfDoc = _pdfDoc;
+        document.getElementById('page_count').textContent = pdfDoc.numPages;
+
+        renderPage(pageNum);
+    }
 
     return {
         nextSlide: () => {
             if (pageNum < pdfDoc.numPages) {
                 pageNum++;
                 queueRenderPage(pageNum);
+                document.getElementById('page_num').textContent = pageNum;
             }
         },
 
@@ -112,28 +155,39 @@ const SlideModule = (() => {
             if (pageNum > 1) {
                 pageNum--;
                 queueRenderPage(pageNum);
+                document.getElementById('page_num').textContent = pageNum;
             }
         },
 
         zoomIn: () => {
-            currentScale += 0.1;  // Ajuste conforme necessário
+            currentScale += 0.1; // Ajuste conforme necessário
             renderPage(pageNum);
         },
-    
+
         zoomOut: () => {
-            currentScale -= 0.1;  // Ajuste conforme necessário
+            currentScale -= 0.1; // Ajuste conforme necessário
             renderPage(pageNum);
         },
 
         init: () => {
-            document.getElementById('inputGroupFile').addEventListener('change', function() { /*...*/ });
+            const fileInput = document.getElementById('inputGroupFile');
+            fileInput.addEventListener('change', function() {
+                const file = fileInput.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const data = new Uint8Array(evt.target.result);
+                    PDFJS.getDocument({ data: data }).promise.then(onDocumentLoaded);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
             document.getElementById('prev').addEventListener('click', SlideModule.prevSlide);
             document.getElementById('next').addEventListener('click', SlideModule.nextSlide);
-            document.getElementById('zoomIn').addEventListener('click', SlideModule.zoomIn);
-            document.getElementById('zoomOut').addEventListener('click', SlideModule.zoomOut);            
         }
     };
 })();
+
 
 // =========================
 // Módulo de Zoom
