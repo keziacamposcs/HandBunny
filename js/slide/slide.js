@@ -1,9 +1,42 @@
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
-let currentScale = 1.0; // Fator de escala atual
-const minScale = 0.5;   // Fator de escala mínimo
-const maxScale = 2.0;   // Fator de escala máximo
+
+let currentScale = 1.0; // Escala atual
+const minScale = 0.5;   // Escala mínima
+const maxScale = 2.0;   // Escala máxima
+let isZooming = false; // Indica se o gesto de zoom está em andamento
+let isShaking = false; // Indica se a mão está sendo agitada
+
+// Função para detectar o gesto de zoom
+function detectZoomGesture(handLandmarks) {
+    const palmBase = handLandmarks[0];
+    const palmCenter = handLandmarks[9]; // Use um ponto central da palma da mão
+
+    // Calcula a distância vertical entre a base da palma e o centro da palma
+    const palmVerticalDistance = Math.abs(palmCenter.y - palmBase.y);
+
+    // Verifique se o movimento é semelhante ao de agitar
+    const shakeThreshold = 20; // Ajuste conforme necessário
+    const isShakingGesture = palmVerticalDistance > shakeThreshold;
+
+    // Inicia o gesto de zoom quando o movimento de agitar é detectado
+    if (isShakingGesture && !isZooming) {
+        isZooming = true;
+        applyZoom(1.1); // Aumenta o zoom quando agitado
+    }
+
+    // Conclui o gesto de zoom quando o movimento de agitar termina
+    if (!isShakingGesture && isZooming) {
+        isZooming = false;
+    }
+}
+
+// Função para aplicar o zoom à página
+function applyZoom(zoomAmount) {
+    document.body.style.zoom = zoomAmount;
+}
+
 
 // Função que processa os resultados da detecção de mãos
 function onResults(results)
@@ -27,6 +60,9 @@ function onResults(results)
             // Atualiza a legenda com a direção do dedo indicador
             //fingerDirectionElement.textContent = checkFingerDirection(landmarks);
             fingerDirectionElement.textContent = direction;
+
+            detectZoomGesture(landmarks);
+
         }
     }
     canvasCtx.restore();
@@ -56,66 +92,6 @@ function checkFingerDirection(handLandmarks)
         return "Esquerda";
     }
 }
-
-// Atualiza o zoom com base no gesto de pinça
-function updateZoomScale(handLandmarks) {
-    const thumbTip = handLandmarks[4];
-    const indexTip = handLandmarks[8];
-    const pinchDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-
-    // Ajuste a sensibilidade do zoom
-    const zoomSensitivity = 0.01;
-
-    // Detectar o gesto de "pinça" (espalhar os dedos)
-    if (pinchDistance > 50) {
-        currentScale += zoomSensitivity;
-        if (currentScale > maxScale) {
-            currentScale = maxScale;
-        }
-        applyZoom();
-    }
-    // Detectar o gesto de "juntar" os dedos
-    else if (pinchDistance < 30) {
-        currentScale -= zoomSensitivity;
-        if (currentScale < minScale) {
-            currentScale = minScale;
-        }
-        applyZoom();
-    }
-}
-
-// Aplica a escala ao canvas do PDF
-function applyZoom() {
-    const newScale = currentScale * scale;
-    canvas.style.transform = `scale(${newScale})`;
-}
-
-// Atualiza o zoom junto com a renderização da página
-function renderPage(num) {
-    pageRendering = true;
-    pdfDoc.getPage(num).then(function (page) {
-        var viewport = page.getViewport({ scale: currentScale * scale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        // Restaura a transformação para evitar acumulação
-        canvas.style.transform = 'scale(1)';
-        applyZoom();
-
-        var renderContext = { canvasContext: ctx, viewport: viewport };
-        var renderTask = page.render(renderContext);
-
-        renderTask.promise.then(function () {
-            pageRendering = false;
-            if (pageNumPending !== null) {
-                renderPage(pageNumPending);
-                pageNumPending = null;
-            }
-        });
-    });
-    document.getElementById('page_num').textContent = num;
-}
-
 
 const fingerDirectionElement = document.getElementById('finger-direction');
 // Fim - Função que verifica a direção do dedo indicador
