@@ -6,9 +6,6 @@ const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
 const fingerDirectionElement = document.getElementById('finger-direction');
 let canClick = true;
-const ZOOM_IN_THRESHOLD = 0.1; // Defina conforme necessário
-const ZOOM_OUT_THRESHOLD = -0.1; // Defina conforme necessário
-let currentScale = 1;  // Escala inicial
 
 // =========================
 // Módulo de Detecção de Gestos
@@ -23,7 +20,7 @@ const GestureModule = (() => {
             for (const landmarks of results.multiHandLandmarks) {
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#F1FAEE', lineWidth: 3});
                 drawLandmarks(canvasCtx, landmarks, {color: '#E63946', lineWidth: 1});
-                handleGestureDirection(checkFingerDirection(landmarks), landmarks);
+                handleGestureDirection(checkFingerDirection(landmarks));
             }
         }
         canvasCtx.restore();
@@ -35,12 +32,12 @@ const GestureModule = (() => {
         return indexPos.x > thumbPos.x ? "Direita" : "Esquerda";
     }
 
-    function handleGestureDirection(direction, handLandmarks) {
+    function handleGestureDirection(direction) {
         fingerDirectionElement.textContent = direction;
         setTimeout(() => {
             fingerDirectionElement.textContent = "";
         }, 2000);
-    
+
         if (direction === "Direita" && canClick) {
             SlideModule.nextSlide();
             canClick = false;
@@ -48,19 +45,11 @@ const GestureModule = (() => {
             SlideModule.prevSlide();
             canClick = false;
         }
-    
-        const zoomChange = checkZoomGesture(handLandmarks);
-        if (zoomChange > ZOOM_IN_THRESHOLD) {
-            SlideModule.zoomIn();
-        } else if (zoomChange < ZOOM_OUT_THRESHOLD) {
-            SlideModule.zoomOut();
-        }
-    
+
         setTimeout(() => {
             canClick = true;
         }, 5000);
     }
-    
 
     return {
         init: () => {
@@ -95,29 +84,24 @@ const GestureModule = (() => {
 // Módulo de Slides (PDF)
 // =========================
 const SlideModule = (() => {
-    let pdfDoc = null,
-        pageNum = 1,
-        pageRendering = false,
-        pageNumPending = null;
-    const canvas = document.getElementById('the-canvas');
-    const context = canvas.getContext('2d');
+    let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null;
+    let scale = 1.0; // Adicione uma variável de escala
 
     function renderPage(num) {
+        // Atualize a função renderPage para incluir a escala
+        const pageCanvas = document.getElementById('the-canvas');
+        const context = pageCanvas.getContext('2d');
         pageRendering = true;
-        
-        pdfDoc.getPage(num).then(page => {
-            const viewport = page.getViewport({ scale: currentScale });
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
 
+        pdfDoc.getPage(num).then(function(page) {
+            const viewport = page.getViewport({ scale: scale });
+            pageCanvas.width = viewport.width;
+            pageCanvas.height = viewport.height;
             const renderContext = {
                 canvasContext: context,
                 viewport: viewport
             };
-
-            const renderTask = page.render(renderContext);
-
-            renderTask.promise.then(() => {
+            page.render(renderContext).promise.then(function () {
                 pageRendering = false;
                 if (pageNumPending !== null) {
                     renderPage(pageNumPending);
@@ -125,92 +109,46 @@ const SlideModule = (() => {
                 }
             });
         });
+        document.getElementById('page_num').textContent = num;
     }
-
-    function queueRenderPage(num) {
-        if (pageRendering) {
-            pageNumPending = num;
-        } else {
-            renderPage(num);
-        }
-    }
-
-    function onDocumentLoaded(_pdfDoc) {
-        pdfDoc = _pdfDoc;
-        document.getElementById('page_count').textContent = pdfDoc.numPages;
-
-        renderPage(pageNum);
-    }
+    
+    function queueRenderPage(num) { /*...*/ }
 
     return {
         nextSlide: () => {
             if (pageNum < pdfDoc.numPages) {
                 pageNum++;
                 queueRenderPage(pageNum);
-                document.getElementById('page_num').textContent = pageNum;
             }
         },
-
         prevSlide: () => {
             if (pageNum > 1) {
                 pageNum--;
                 queueRenderPage(pageNum);
-                document.getElementById('page_num').textContent = pageNum;
+            }
+        },
+        zoomIn: () => {
+            if (scale < 2.0) { // Defina um limite de zoom
+                scale += 0.1; // Aumente a escala
+                renderPage(pageNum);
+            }
+        },
+        zoomOut: () => {
+            if (scale > 0.5) { // Defina um limite de zoom
+                scale -= 0.1; // Diminua a escala
+                renderPage(pageNum);
             }
         },
 
-        zoomIn: () => {
-            currentScale += 0.1; // Ajuste conforme necessário
-            renderPage(pageNum);
-        },
-
-        zoomOut: () => {
-            currentScale -= 0.1; // Ajuste conforme necessário
-            renderPage(pageNum);
-        },
-
         init: () => {
-            const fileInput = document.getElementById('inputGroupFile');
-            fileInput.addEventListener('change', function() {
-                const file = fileInput.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const data = new Uint8Array(evt.target.result);
-                    PDFJS.getDocument({ data: data }).promise.then(onDocumentLoaded);
-                };
-                reader.readAsArrayBuffer(file);
-            });
-
+            document.getElementById('inputGroupFile').addEventListener('change', function() { /*...*/ });
             document.getElementById('prev').addEventListener('click', SlideModule.prevSlide);
             document.getElementById('next').addEventListener('click', SlideModule.nextSlide);
+            document.getElementById('zoomIn').addEventListener('click', SlideModule.zoomIn);
+            document.getElementById('zoomOut').addEventListener('click', SlideModule.zoomOut);
         }
     };
 })();
-
-
-
-// =========================
-// Módulo de Zoom
-// =========================
-function checkZoomGesture(handLandmarks) {
-    const thumbPos = handLandmarks[4];
-    const indexPos = handLandmarks[8];
-    const distance = Math.sqrt(Math.pow((thumbPos.x - indexPos.x), 2) + Math.pow((thumbPos.y - indexPos.y), 2));
-
-    // Compare com a distância anterior (se disponível)
-    if (typeof checkZoomGesture.previousDistance === "undefined") {
-        checkZoomGesture.previousDistance = distance;
-        return 0; 
-    }
-
-    const distanceChange = distance - checkZoomGesture.previousDistance;
-    checkZoomGesture.previousDistance = distance;
-    return distanceChange;
-}
-
-
-
 
 // =========================
 // Inicialização dos Módulos
