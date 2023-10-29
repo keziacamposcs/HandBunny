@@ -1,112 +1,131 @@
-const videoElement = document.getElementsByClassName('input_video')[0];
-const canvasElement = document.getElementsByClassName('output_canvas')[0];
-const canvasCtx = canvasElement.getContext('2d');
+// =========================
+// Configurações Iniciais
+// =========================
+const elementoVideo = document.getElementsByClassName('input_video')[0];
+const elementoCanvas = document.getElementsByClassName('output_canvas')[0];
+const contextoCanvas = elementoCanvas.getContext('2d');
+const elementoQuadro = document.getElementById('quadro');
+const contextoQuadro = elementoQuadro.getContext('2d');
+let desenhando = false;
+let x, y;
 
-const canvasQuadro = document.getElementById('quadro');
-
-var ctx = canvasQuadro.getContext('2d');
-var desenhando = false;
-var x, y;
-
-function drawHandLandmarks(results, ctx) {
-  if (results.multiHandLandmarks) {
-    for (const landmarks of results.multiHandLandmarks) {
-      const landmark = landmarks[4]; // seleciona a ponta do dedo indicador (landmark 4)
-      ctx.beginPath();
-      ctx.arc(landmark.x * canvasQuadro.width, landmark.y * canvasQuadro.height, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = '#1B335F';
-      ctx.fill();
+// =========================
+// Módulo de Desenho
+// =========================
+const ModuloDesenho = (() => {
+    function desenharMarcadoresMao(results, contextoQuadro) {
+        if (results.multiHandLandmarks) {
+            for (const landmarks of results.multiHandLandmarks) {
+                const landmark = landmarks[4];
+                contextoQuadro.beginPath();
+                contextoQuadro.arc(landmark.x * elementoQuadro.width, landmark.y * elementoQuadro.height, 5, 0, 2 * Math.PI);
+                contextoQuadro.fillStyle = '#1B335F';
+                contextoQuadro.fill();
+            }
+        }
     }
-  }
-}
 
-
-function limpar() {
-  var canvas = document.getElementById("quadro");
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// Função que processa os resultados da detecção de mãos
-function onResults(results) {
-  canvasCtx.save();
-
-  // Limpa o canvas
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-  // Desenha a imagem da câmera no canvas
-  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-  if (results.multiHandLandmarks) {
-    for (const landmarks of results.multiHandLandmarks) {
-      drawLandmarks(canvasCtx, [landmarks[8]], {color: '#9F3B25', lineWidth: 1});
-      const indexFinger = landmarks[8]; // seleciona a ponta do dedo indicador (landmark 8)
-      const handOpen = indexFinger.y < landmarks[5].y; // verifica se o dedo indicador está abaixo do dedo médio (landmark 5)
-
-      if (handOpen) {
-        // Mão aberta (pincel)
-        ctx.strokeStyle = '#1B335F'; //cor do pincel
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-      } else {
-        // Mão fechada (apagador)
-        ctx.strokeStyle = '#f5f5f5'; //cor do apagador
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round'; 
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(indexFinger.x * canvasQuadro.width, indexFinger.y * canvasQuadro.height);
-      ctx.lineTo(landmarks[7].x * canvasQuadro.width, landmarks[7].y * canvasQuadro.height);
-      ctx.stroke();
+    function limpar() {
+        contextoQuadro.clearRect(0, 0, elementoQuadro.width, elementoQuadro.height);
     }
-  }
 
-  canvasCtx.restore();
-}
+    function aoSoltaMouse(evt) {
+        desenhando = true;
+        x = evt.clientX - elementoQuadro.getBoundingClientRect().left;
+        y = evt.clientY - elementoQuadro.getBoundingClientRect().top;
+    }
 
+    function aoMoverMouse(evt) {
+        if (desenhando) {
+            contextoQuadro.beginPath();
+            contextoQuadro.moveTo(x, y);
+            x = evt.clientX - elementoQuadro.getBoundingClientRect().left;
+            y = evt.clientY - elementoQuadro.getBoundingClientRect().top;
+            contextoQuadro.lineTo(x, y);
+            contextoQuadro.stroke();
+        }
+    }
 
-canvasQuadro.addEventListener("mouseup", function(evt) {
-  desenhando = true;
-  x = evt.clientX - canvasQuadro.getBoundingClientRect().left;
-  y = evt.clientY - canvasQuadro.getBoundingClientRect().top;
-});
+    return {
+        desenharMarcadoresMao,
+        limpar,
+        aoSoltaMouse,
+        aoMoverMouse
+    };
+})();
 
-canvasQuadro.addEventListener("mousemove", function(evt) {
-  if (desenhando) {
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    x = evt.clientX - canvasQuadro.getBoundingClientRect().left;
-    y = evt.clientY - canvasQuadro.getBoundingClientRect().top;
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  }
-});
+// =========================
+// Módulo de Detecção de Gestos
+// =========================
+const ModuloDeteccaoMaos = (() => {
+    function aoResultados(results) {
+        contextoCanvas.save();
+        contextoCanvas.clearRect(0, 0, elementoCanvas.width, elementoCanvas.height);
+        contextoCanvas.drawImage(results.image, 0, 0, elementoCanvas.width, elementoCanvas.height);
 
+        if (results.multiHandLandmarks) {
+            for (const landmarks of results.multiHandLandmarks) {
+                ModuloDesenho.desenharMarcadoresMao(results, contextoQuadro);
 
+                const indexFinger = landmarks[8];
+                const handOpen = indexFinger.y < landmarks[5].y;
 
+                if (handOpen) {
+                    contextoQuadro.strokeStyle = '#1B335F';
+                } else {
+                    contextoQuadro.strokeStyle = '#f5f5f5';
+                }
 
+                contextoQuadro.lineWidth = 5;
+                contextoQuadro.lineCap = 'round';
+                contextoQuadro.beginPath();
+                contextoQuadro.moveTo(indexFinger.x * elementoQuadro.width, indexFinger.y * elementoQuadro.height);
+                contextoQuadro.lineTo(landmarks[7].x * elementoQuadro.width, landmarks[7].y * elementoQuadro.height);
+                contextoQuadro.stroke();
+            }
+        }
 
-// Configura o detector de mãos do MediaPipe Hands
-const hands = new Hands({locateFile: (file) => {
-  return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-}});
+        contextoCanvas.restore();
+    }
 
-hands.setOptions({
-  selfieMode: true,
-  maxNumHands: 1,
-  modelComplexity: 1,
-  minDetectionConfidence: 0.9,
-  minTrackingConfidence: 0.9
-});
-hands.onResults(onResults);
+    return {
+        aoResultados
+    };
+})();
 
-// Inicializa a câmera
-const camera = new Camera(videoElement,
-{
-  onFrame: async () => {
-    await hands.send({image: videoElement});
-  },
-  width: 1024,
-  height: 768
-});
-camera.start();
+// =========================
+// Módulo da Câmera
+// =========================
+const ModuloCamera = (() => {
+    const hands = new Hands({
+        locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }
+    });
+
+    hands.setOptions({
+        selfieMode: true,
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.9,
+        minTrackingConfidence: 0.9
+    });
+
+    hands.aoResultados(ModuloDeteccaoMaos.aoResultados);
+
+    const camera = new Camera(elementoVideo, {
+        onFrame: async () => {
+            await hands.send({ image: elementoVideo });
+        },
+        width: 1024,
+        height: 768
+    });
+
+    camera.start();
+})();
+
+// =========================
+// Event Listeners
+// =========================
+elementoQuadro.addEventListener("mouseup", ModuloDesenho.aoSoltaMouse);
+elementoQuadro.addEventListener("mousemove", ModuloDesenho.aoMoverMouse);
