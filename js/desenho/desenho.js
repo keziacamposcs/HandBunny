@@ -1,11 +1,11 @@
 // =========================
 // Configurações Iniciais
 // =========================
-const elementoVideo = document.getElementsByClassName('input_video')[0];
-const elementoCanvas = document.getElementsByClassName('output_canvas')[0];
-const contextoCanvas = elementoCanvas.getContext('2d');
-const elementoQuadro = document.getElementById('quadro');
-const contextoQuadro = elementoQuadro.getContext('2d');
+const videoElement = document.getElementsByClassName('input_video')[0];
+const canvasElement = document.getElementsByClassName('output_canvas')[0];
+const canvasCtx = canvasElement.getContext('2d');
+const canvasQuadro = document.getElementById('quadro');
+const ctx = canvasQuadro.getContext('2d');
 let desenhando = false;
 let x, y;
 
@@ -13,36 +13,36 @@ let x, y;
 // Módulo de Desenho
 // =========================
 const ModuloDesenho = (() => {
-    function desenharMarcadoresMao(results, contextoQuadro) {
+    function desenharMarcadoresMao(results, ctx) {
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
                 const landmark = landmarks[4];
-                contextoQuadro.beginPath();
-                contextoQuadro.arc(landmark.x * elementoQuadro.width, landmark.y * elementoQuadro.height, 5, 0, 2 * Math.PI);
-                contextoQuadro.fillStyle = '#1B335F';
-                contextoQuadro.fill();
+                ctx.beginPath();
+                ctx.arc(landmark.x * canvasQuadro.width, landmark.y * canvasQuadro.height, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1B335F';
+                ctx.fill();
             }
         }
     }
 
     function limpar() {
-        contextoQuadro.clearRect(0, 0, elementoQuadro.width, elementoQuadro.height);
+        ctx.clearRect(0, 0, canvasQuadro.width, canvasQuadro.height);
     }
 
     function aoSoltaMouse(evt) {
         desenhando = true;
-        x = evt.clientX - elementoQuadro.getBoundingClientRect().left;
-        y = evt.clientY - elementoQuadro.getBoundingClientRect().top;
+        x = evt.clientX - canvasQuadro.getBoundingClientRect().left;
+        y = evt.clientY - canvasQuadro.getBoundingClientRect().top;
     }
 
     function aoMoverMouse(evt) {
         if (desenhando) {
-            contextoQuadro.beginPath();
-            contextoQuadro.moveTo(x, y);
-            x = evt.clientX - elementoQuadro.getBoundingClientRect().left;
-            y = evt.clientY - elementoQuadro.getBoundingClientRect().top;
-            contextoQuadro.lineTo(x, y);
-            contextoQuadro.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            x = evt.clientX - canvasQuadro.getBoundingClientRect().left;
+            y = evt.clientY - canvasQuadro.getBoundingClientRect().top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
         }
     }
 
@@ -55,37 +55,36 @@ const ModuloDesenho = (() => {
 })();
 
 // =========================
-// Módulo de Detecção de Gestos
+// Módulo de Detecção de Mãos
 // =========================
 const ModuloDeteccaoMaos = (() => {
     function aoResultados(results) {
-        contextoCanvas.save();
-        contextoCanvas.clearRect(0, 0, elementoCanvas.width, elementoCanvas.height);
-        contextoCanvas.drawImage(results.image, 0, 0, elementoCanvas.width, elementoCanvas.height);
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        ModuloDesenho.desenharMarcadoresMao(results, ctx);
 
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
-                ModuloDesenho.desenharMarcadoresMao(results, contextoQuadro);
-
                 const indexFinger = landmarks[8];
                 const handOpen = indexFinger.y < landmarks[5].y;
 
                 if (handOpen) {
-                    contextoQuadro.strokeStyle = '#1B335F';
+                    ctx.strokeStyle = '#1B335F';
                 } else {
-                    contextoQuadro.strokeStyle = '#f5f5f5';
+                    ctx.strokeStyle = '#f5f5f5';
                 }
 
-                contextoQuadro.lineWidth = 5;
-                contextoQuadro.lineCap = 'round';
-                contextoQuadro.beginPath();
-                contextoQuadro.moveTo(indexFinger.x * elementoQuadro.width, indexFinger.y * elementoQuadro.height);
-                contextoQuadro.lineTo(landmarks[7].x * elementoQuadro.width, landmarks[7].y * elementoQuadro.height);
-                contextoQuadro.stroke();
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(indexFinger.x * canvasQuadro.width, indexFinger.y * canvasQuadro.height);
+                ctx.lineTo(landmarks[7].x * canvasQuadro.width, landmarks[7].y * canvasQuadro.height);
+                ctx.stroke();
             }
         }
 
-        contextoCanvas.restore();
+        canvasCtx.restore();
     }
 
     return {
@@ -111,21 +110,26 @@ const ModuloCamera = (() => {
         minTrackingConfidence: 0.9
     });
 
-    hands.aoResultados(ModuloDeteccaoMaos.aoResultados);
+    hands.onResults(ModuloDeteccaoMaos.aoResultados);
 
-    const camera = new Camera(elementoVideo, {
+    const camera = new Camera(videoElement, {
         onFrame: async () => {
-            await hands.send({ image: elementoVideo });
+            await hands.send({ image: videoElement });
         },
         width: 1024,
         height: 768
     });
 
     camera.start();
+
+    return {
+        hands,
+        camera
+    };
 })();
 
 // =========================
 // Event Listeners
 // =========================
-elementoQuadro.addEventListener("mouseup", ModuloDesenho.aoSoltaMouse);
-elementoQuadro.addEventListener("mousemove", ModuloDesenho.aoMoverMouse);
+canvasQuadro.addEventListener("mouseup", ModuloDesenho.aoSoltaMouse);
+canvasQuadro.addEventListener("mousemove", ModuloDesenho.aoMoverMouse);
