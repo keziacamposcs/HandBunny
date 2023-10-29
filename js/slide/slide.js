@@ -1,58 +1,59 @@
 // =========================
 // Configurações Iniciais
 // =========================
-const videoElement = document.getElementsByClassName('input_video')[0];
-const canvasElement = document.getElementsByClassName('output_canvas')[0];
-const canvasCtx = canvasElement.getContext('2d');
-const fingerDirectionElement = document.getElementById('finger-direction');
-let canClick = true;
+const elementoVideo = document.getElementsByClassName('input_video')[0];
+const elementoCanvas = document.getElementsByClassName('output_canvas')[0];
+const contextoCanvas = elementoCanvas.getContext('2d');
+const elementoDirecaoDedo = document.getElementById('finger-direction');
+let podeClicar = true;
 
 // =========================
 // Módulo de Detecção de Gestos
 // =========================
-const GestureModule = (() => {
-    function onResults(results) {
-        canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+const ModuloDeteccaoGestos = (() => {
+
+    function aoResultados(results) {
+        contextoCanvas.save();
+        contextoCanvas.clearRect(0, 0, elementoCanvas.width, elementoCanvas.height);
+        contextoCanvas.drawImage(results.image, 0, 0, elementoCanvas.width, elementoCanvas.height);
 
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
-                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#F1FAEE', lineWidth: 3});
-                drawLandmarks(canvasCtx, landmarks, {color: '#E63946', lineWidth: 1});
-                handleGestureDirection(checkFingerDirection(landmarks));
+                drawConnectors(contextoCanvas, landmarks, HAND_CONNECTIONS, {color: '#F1FAEE', lineWidth: 3});
+                drawLandmarks(contextoCanvas, landmarks, {color: '#E63946', lineWidth: 1});
+                manipularDirecaoGesto(verificarDirecaoDedo(landmarks));
             }
         }
-        canvasCtx.restore();
+        contextoCanvas.restore();
     }
 
-    function checkFingerDirection(handLandmarks) {
+    function verificarDirecaoDedo(handLandmarks) {
         const thumbPos = handLandmarks[4];
         const indexPos = handLandmarks[8];
         return indexPos.x > thumbPos.x ? "Direita" : "Esquerda";
     }
 
-    function handleGestureDirection(direction) {
-        fingerDirectionElement.textContent = direction;
+    function manipularDirecaoGesto(direction) {
+        elementoDirecaoDedo.textContent = direction;$
         setTimeout(() => {
-            fingerDirectionElement.textContent = "";
+            elementoDirecaoDedo.textContent = "";
         }, 2000);
 
-        if (direction === "Direita" && canClick) {
-            SlideModule.nextSlide();
-            canClick = false;
-        } else if (direction === "Esquerda" && canClick) {
-            SlideModule.prevSlide();
-            canClick = false;
+        if (direction === "Direita" && podeClicar) {
+            ModuloSlides.proximoSlide();
+            podeClicar = false;
+        } else if (direction === "Esquerda" && podeClicar) {
+            ModuloSlides.slideAnterior();
+            podeClicar = false;
         }
 
         setTimeout(() => {
-            canClick = true;
+            podeClicar = true;
         }, 5000);
     }
 
     return {
-        init: () => {
+        iniciar: () => {
             const hands = new Hands({
                 locateFile: (file) => {
                     return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
@@ -62,11 +63,11 @@ const GestureModule = (() => {
             hands.setOptions({
                 selfieMode: true,
             });
-            hands.onResults(onResults);
+            hands.aoResultados(aoResultados);
 
-            const camera = new Camera(videoElement, {
+            const camera = new Camera(elementoVideo, {
                 onFrame: async () => {
-                    await hands.send({image: videoElement});
+                    await hands.send({image: elementoVideo});
                 },
                 height: 768
             });
@@ -78,29 +79,29 @@ const GestureModule = (() => {
 // =========================
 // Módulo de Slides (PDF)
 // =========================
-const SlideModule = (() => {
-    let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null;
+const ModuloSlides = (() => {
+    let docPdf = null, numPagina = 1, renderizandoPagina = false, numPaginaPendente = null;
 
-    function renderPage(num) { /*...*/ }
-    function queueRenderPage(num) { /*...*/ }
+    function renderizarPagina(num) { /*...*/ }
+    function enfileirarRenderizacaoPagina(num) { /*...*/ }
 
     return {
-        nextSlide: () => {
-            if (pageNum < pdfDoc.numPages) {
-                pageNum++;
-                queueRenderPage(pageNum);
+        proximoSlide: () => {
+            if (numPagina < docPdf.numPages) {
+                numPagina++;
+                enfileirarRenderizacaoPagina(numPagina);
             }
         },
-        prevSlide: () => {
-            if (pageNum > 1) {
-                pageNum--;
-                queueRenderPage(pageNum);
+        slideAnterior: () => {
+            if (numPagina > 1) {
+                numPagina--;
+                enfileirarRenderizacaoPagina(numPagina);
             }
         },
-        init: () => {
+        iniciar: () => {
             document.getElementById('inputGroupFile').addEventListener('change', function() { /*...*/ });
-            document.getElementById('prev').addEventListener('click', SlideModule.prevSlide);
-            document.getElementById('next').addEventListener('click', SlideModule.nextSlide);
+            document.getElementById('prev').addEventListener('click', ModuloSlides.slideAnterior);
+            document.getElementById('next').addEventListener('click', ModuloSlides.proximoSlide);
         }
     };
 })();
@@ -109,6 +110,6 @@ const SlideModule = (() => {
 // Inicialização dos Módulos
 // =========================
 window.onload = () => {
-    GestureModule.init();
-    SlideModule.init();
+    ModuloDeteccaoGestos.iniciar();
+    ModuloSlides.iniciar();
 };

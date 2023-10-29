@@ -1,102 +1,102 @@
 // =========================
 // Configurações Iniciais
 // =========================
-const videoElement = document.getElementsByClassName('input_video')[0];
-const canvasElement = document.getElementsByClassName('output_canvas')[0];
-const canvasCtx = canvasElement.getContext('2d');
-const canvasQuadro = document.getElementById('quadro');
-const ctx = canvasQuadro.getContext('2d');
+const elementoVideo = document.getElementsByClassName('input_video')[0];
+const elementoCanvas = document.getElementsByClassName('output_canvas')[0];
+const contextoCanvas = elementoCanvas.getContext('2d');
+const elementoQuadro = document.getElementById('quadro');
+const contextoQuadro = elementoQuadro.getContext('2d');
 let desenhando = false;
 let x, y;
 
 // =========================
 // Módulo de Desenho
 // =========================
-const DrawModule = (() => {
-    function drawHandLandmarks(results, ctx) {
+const ModuloDesenho = (() => {
+    function desenharMarcadoresMao(results, contextoQuadro) {
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
                 const landmark = landmarks[4];
-                ctx.beginPath();
-                ctx.arc(landmark.x * canvasQuadro.width, landmark.y * canvasQuadro.height, 5, 0, 2 * Math.PI);
-                ctx.fillStyle = '#1B335F';
-                ctx.fill();
+                contextoQuadro.beginPath();
+                contextoQuadro.arc(landmark.x * elementoQuadro.width, landmark.y * elementoQuadro.height, 5, 0, 2 * Math.PI);
+                contextoQuadro.fillStyle = '#1B335F';
+                contextoQuadro.fill();
             }
         }
     }
 
     function limpar() {
-        ctx.clearRect(0, 0, canvasQuadro.width, canvasQuadro.height);
+        contextoQuadro.clearRect(0, 0, elementoQuadro.width, elementoQuadro.height);
     }
 
-    function onMouseUp(evt) {
+    function aoSoltaMouse(evt) {
         desenhando = true;
-        x = evt.clientX - canvasQuadro.getBoundingClientRect().left;
-        y = evt.clientY - canvasQuadro.getBoundingClientRect().top;
+        x = evt.clientX - elementoQuadro.getBoundingClientRect().left;
+        y = evt.clientY - elementoQuadro.getBoundingClientRect().top;
     }
 
-    function onMouseMove(evt) {
+    function aoMoverMouse(evt) {
         if (desenhando) {
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            x = evt.clientX - canvasQuadro.getBoundingClientRect().left;
-            y = evt.clientY - canvasQuadro.getBoundingClientRect().top;
-            ctx.lineTo(x, y);
-            ctx.stroke();
+            contextoQuadro.beginPath();
+            contextoQuadro.moveTo(x, y);
+            x = evt.clientX - elementoQuadro.getBoundingClientRect().left;
+            y = evt.clientY - elementoQuadro.getBoundingClientRect().top;
+            contextoQuadro.lineTo(x, y);
+            contextoQuadro.stroke();
         }
     }
 
     return {
-        drawHandLandmarks,
+        desenharMarcadoresMao,
         limpar,
-        onMouseUp,
-        onMouseMove
+        aoSoltaMouse,
+        aoMoverMouse
     };
 })();
 
 // =========================
-// Módulo de Detecção de Mãos
+// Módulo de Detecção de Gestos
 // =========================
-const HandDetectionModule = (() => {
-    function onResults(results) {
-        canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+const ModuloDeteccaoMaos = (() => {
+    function aoResultados(results) {
+        contextoCanvas.save();
+        contextoCanvas.clearRect(0, 0, elementoCanvas.width, elementoCanvas.height);
+        contextoCanvas.drawImage(results.image, 0, 0, elementoCanvas.width, elementoCanvas.height);
 
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
-                DrawModule.drawHandLandmarks(results, ctx);
+                ModuloDesenho.desenharMarcadoresMao(results, contextoQuadro);
 
                 const indexFinger = landmarks[8];
                 const handOpen = indexFinger.y < landmarks[5].y;
 
                 if (handOpen) {
-                    ctx.strokeStyle = '#1B335F';
+                    contextoQuadro.strokeStyle = '#1B335F';
                 } else {
-                    ctx.strokeStyle = '#f5f5f5';
+                    contextoQuadro.strokeStyle = '#f5f5f5';
                 }
 
-                ctx.lineWidth = 5;
-                ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(indexFinger.x * canvasQuadro.width, indexFinger.y * canvasQuadro.height);
-                ctx.lineTo(landmarks[7].x * canvasQuadro.width, landmarks[7].y * canvasQuadro.height);
-                ctx.stroke();
+                contextoQuadro.lineWidth = 5;
+                contextoQuadro.lineCap = 'round';
+                contextoQuadro.beginPath();
+                contextoQuadro.moveTo(indexFinger.x * elementoQuadro.width, indexFinger.y * elementoQuadro.height);
+                contextoQuadro.lineTo(landmarks[7].x * elementoQuadro.width, landmarks[7].y * elementoQuadro.height);
+                contextoQuadro.stroke();
             }
         }
 
-        canvasCtx.restore();
+        contextoCanvas.restore();
     }
 
     return {
-        onResults
+        aoResultados
     };
 })();
 
 // =========================
 // Módulo da Câmera
 // =========================
-const CameraModule = (() => {
+const ModuloCamera = (() => {
     const hands = new Hands({
         locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
@@ -111,11 +111,11 @@ const CameraModule = (() => {
         minTrackingConfidence: 0.9
     });
 
-    hands.onResults(HandDetectionModule.onResults);
+    hands.aoResultados(ModuloDeteccaoMaos.aoResultados);
 
-    const camera = new Camera(videoElement, {
+    const camera = new Camera(elementoVideo, {
         onFrame: async () => {
-            await hands.send({ image: videoElement });
+            await hands.send({ image: elementoVideo });
         },
         width: 1024,
         height: 768
@@ -127,5 +127,5 @@ const CameraModule = (() => {
 // =========================
 // Event Listeners
 // =========================
-canvasQuadro.addEventListener("mouseup", DrawModule.onMouseUp);
-canvasQuadro.addEventListener("mousemove", DrawModule.onMouseMove);
+elementoQuadro.addEventListener("mouseup", ModuloDesenho.aoSoltaMouse);
+elementoQuadro.addEventListener("mousemove", ModuloDesenho.aoMoverMouse);
