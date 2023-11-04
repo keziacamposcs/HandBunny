@@ -45,7 +45,7 @@ function onResults(results) {
     if (results.multiHandLandmarks) {
         for (const landmarks of results.multiHandLandmarks) {
             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#F1FAEE', lineWidth: 3 });
-            drawLandmarks(canvasCtx, landmarks, { color: '#E63946', lineWidth: 1 });
+            drawLandmarks(canvasCtx, landmarks, { color: '#F26D4F', lineWidth: 1 });
 
             const direction = checkFingerDirection(landmarks);
             fingerDirectionElement.textContent = direction;
