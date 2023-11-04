@@ -2,12 +2,12 @@
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
-const fingerDirectionElement = document.getElementById('finger-direction');
+const fingerdirecaoElement = document.getElementById('direcao_dedo');
 
 // Configurações e estados iniciais
-let currentPDF = null;
-let currentPage = 1;
-let canClick = true;
+let pdfAtual = null;
+let PaginaAtual = 1;
+let podeClicar = true;
 
 // Inicialização do detector de mãos do MediaPipe Hands
 const hands = new Hands({
@@ -45,33 +45,33 @@ function onResults(results) {
     if (results.multiHandLandmarks) {
         for (const landmarks of results.multiHandLandmarks) {
             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#F1FAEE', lineWidth: 3 });
-            drawLandmarks(canvasCtx, landmarks, { color: '#E63946', lineWidth: 1 });
+            drawLandmarks(canvasCtx, landmarks, { color: '#F26D4F', lineWidth: 1 });
 
-            const direction = checkFingerDirection(landmarks);
-            fingerDirectionElement.textContent = direction;
+            const direcao = VerificarDirecaoDedo(landmarks);
+            fingerdirecaoElement.textContent = direcao;
         }
     }
     canvasCtx.restore();
 }
 
-function checkFingerDirection(handLandmarks) {
+function VerificarDirecaoDedo(handLandmarks) {
     const thumbPos = handLandmarks[4];
     const indexPos = handLandmarks[8];
-    const direction = indexPos.x > thumbPos.x ? "Direita" : "Esquerda";
+    const direcao = indexPos.x > thumbPos.x ? "Direita" : "Esquerda";
 
-    document.getElementById("finger-direction").textContent = direction;
+    document.getElementById("direcao_dedo").textContent = direcao;
     setTimeout(() => {
-        document.getElementById("finger-direction").textContent = "";
+        document.getElementById("direcao_dedo").textContent = "";
     }, 2000);
 
-    return direction;
+    return direcao;
 }
 
 function displayPage(page) {
     const pdfViewer = document.getElementById('pdf-viewer');
     pdfViewer.innerHTML = '';
     const iframe = document.createElement('iframe');
-    iframe.src = currentPDF + "#page=" + page;
+    iframe.src = pdfAtual + "#page=" + page;
     iframe.style.width = '100%';
     iframe.style.height = '500px';
     pdfViewer.appendChild(iframe);
@@ -81,40 +81,40 @@ function displayPage(page) {
 document.getElementById('file-input').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file.type === "application/pdf") {
-        currentPDF = URL.createObjectURL(file);
-        currentPage = 1;
-        displayPage(currentPage);
+        pdfAtual = URL.createObjectURL(file);
+        PaginaAtual = 1;
+        displayPage(PaginaAtual);
     } else {
         alert("Por favor, selecione um arquivo PDF.");
     }
 });
 
-document.getElementById('prev').addEventListener('click', function() {
-    if (currentPage > 1) {
-        currentPage--;
-        displayPage(currentPage);
+document.getElementById('anterior').addEventListener('click', function() {
+    if (PaginaAtual > 1) {
+        PaginaAtual--;
+        displayPage(PaginaAtual);
     }
 });
 
-document.getElementById('next').addEventListener('click', function() {
-    currentPage++;
-    displayPage(currentPage);
+document.getElementById('proximo').addEventListener('click', function() {
+    PaginaAtual++;
+    displayPage(PaginaAtual);
 });
 
 // Observador para mudança de páginas do PDF baseado na direção do dedo
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     const texto = mutation.target.textContent.toLowerCase();
-    if (texto.includes("direita") && canClick) {
-        document.getElementById("next").click();
-        canClick = false;
-        setTimeout(() => canClick = true, 5000);
-    } else if (texto.includes("esquerda") && canClick) {
-        document.getElementById("prev").click();
-        canClick = false;
-        setTimeout(() => canClick = true, 5000);
+    if (texto.includes("direita") && podeClicar) {
+        document.getElementById("proximo").click();
+        podeClicar = false;
+        setTimeout(() => podeClicar = true, 5000);
+    } else if (texto.includes("esquerda") && podeClicar) {
+        document.getElementById("anterior").click();
+        podeClicar = false;
+        setTimeout(() => podeClicar = true, 5000);
     }
   });
 });
 
-observer.observe(fingerDirectionElement, { childList: true });
+observer.observe(fingerdirecaoElement, { childList: true });
