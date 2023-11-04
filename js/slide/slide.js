@@ -5,7 +5,6 @@ const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
 
-// Função que processa os resultados da detecção de mãos
 function onResults(results)
 {
     canvasCtx.save();
@@ -23,7 +22,47 @@ function onResults(results)
     }
     canvasCtx.restore();
 }
+// --------------------
+//  Fim - Camera
+// --------------------
 
+
+// --------------------
+//  Direcao do dedo
+// --------------------
+function checkFingerDirection(handLandmarks)
+{
+    const thumbPos = handLandmarks[4];
+    const indexPos = handLandmarks[8];
+
+    if (indexPos.x > thumbPos.x)
+    {
+        // Exibe "Direita" por 1 segundos
+        document.getElementById("finger-direction").textContent = "Direita";
+        setTimeout(() => {
+            document.getElementById("finger-direction").textContent = "";
+        }, 2000);
+        return "Direita";
+    }
+    else
+    {
+        // Exibe "Esquerda" por 1 segundos
+        document.getElementById("finger-direction").textContent = "Esquerda";
+        setTimeout(() => {
+            document.getElementById("finger-direction").textContent = "";
+        }, 2000);
+        return "Esquerda";
+    }
+}
+const fingerDirectionElement = document.getElementById('finger-direction');
+// --------------------
+//  Fim - Direcao do dedo
+// --------------------
+
+
+// --------------------
+//  Configuração MediaPipe
+// --------------------
 const hands = new Hands({locateFile: (file) => {
   return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
 }});
@@ -37,58 +76,27 @@ hands.setOptions({
 });
 hands.onResults(onResults);
 
+// Inicializa a câmera
 const camera = new Camera(videoElement,
-  {
-    onFrame: async () => {
-      await hands.send({image: videoElement});
-    },
-    width: 1024,
-    height: 768
-  });
-  camera.start();
-// --------------------
-//  Fim - Camera
-// --------------------
-
-
-
-// --------------------
-// Direcao do dedo
-// --------------------
-function checkFingerDirection(handLandmarks)
 {
-    const thumbPos = handLandmarks[4];
-    const indexPos = handLandmarks[8];
-
-    if (indexPos.x > thumbPos.x)
-    {
-        document.getElementById("finger-direction").textContent = "Direita";
-        setTimeout(() => {
-            document.getElementById("finger-direction").textContent = "";
-        }, 2000);
-        return "Direita";
-    }
-    else
-    {
-        document.getElementById("finger-direction").textContent = "Esquerda";
-        setTimeout(() => {
-            document.getElementById("finger-direction").textContent = "";
-        }, 2000);
-        return "Esquerda";
-    }
-}
-const fingerDirectionElement = document.getElementById('finger-direction');
+  onFrame: async () => {
+    await hands.send({image: videoElement});
+  },
+  width: 1024,
+  height: 768
+});
+camera.start();
 // --------------------
-// Fim  - Direcao do dedo
+//  Fim  - Configuração MediaPipe
 // --------------------
 
 
-
 // --------------------
-//  PDF Viewer
+//  PDF
 // --------------------
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+
 var pdfDoc = null,
 pageNum = 1,
 pageRendering = false,
@@ -98,20 +106,16 @@ canvas = document.getElementById('the-canvas'),
 ctx = canvas.getContext('2d');
 
 
-
 function renderPage(num)
 {
   pageRendering = true;
   pdfDoc.getPage(num).then(function(page)
   {
     var viewport = page.getViewport({scale: scale});
-    var renderContext = {canvasContext: ctx, viewport: viewport };
-    var renderTask = page.render(renderContext);
-
     canvas.height = viewport.height;
     canvas.width = viewport.width;
-
-    // Wait for rendering to finish
+    var renderContext = {canvasContext: ctx, viewport: viewport };
+    var renderTask = page.render(renderContext);
     renderTask.promise.then(function()
     {
       pageRendering = false;
@@ -124,6 +128,7 @@ function renderPage(num)
   });
   document.getElementById('page_num').textContent = num;
 }
+
 
 function queueRenderPage(num)
 {
@@ -159,6 +164,7 @@ function onNextPage()
 }
 document.getElementById('next').addEventListener('click', onNextPage);
 
+
 document.getElementById('inputGroupFile').addEventListener('change', function()
 {
   var file = this.files[0];
@@ -176,16 +182,16 @@ document.getElementById('inputGroupFile').addEventListener('change', function()
   fileReader.readAsArrayBuffer(file);
 });
 // --------------------
-//  Fim - PDF Viewer
+//  Fim - PDF
 // --------------------
 
 
 // --------------------
-//  Navegacao entre paginas
+//  Listeners
 // --------------------
 const botao_prox = document.getElementById("next");
 const botao_antes = document.getElementById("prev");
-let canClick = true;
+let canClick = true; // Variável para controlar o delay entre cliques
 const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
         const texto = mutation.target.textContent.toLowerCase();
@@ -209,5 +215,5 @@ const observer = new MutationObserver((mutations) => {
 });
 observer.observe(document.body, { childList: true, subtree: true });
 // --------------------
-//  Fim - Navegacao entre paginas
+//  Fim - Listeners
 // --------------------
