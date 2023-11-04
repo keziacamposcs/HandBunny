@@ -14,7 +14,7 @@ const hands = new Hands({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 });
 
-// Opções para o detector de mãos
+// Configuração do detector de mãos
 hands.setOptions({
   selfieMode: true,
   maxNumHands: 1,
