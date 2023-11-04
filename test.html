@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visualizador de PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.6/pdfobject.min.js"></script>
+    <style>
+        #pdf-viewer { width: 100%; height: 500px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Selecione um arquivo PDF:</h2>
+    <input type="file" id="file-input" accept="application/pdf" />
+    
+    <hr/>
+
+    <div id="pdf-viewer"></div>
+
+    <!-- Botões de navegação -->
+    <!-- Note que com PDFObject, a navegação de página é mais limitada; você geralmente conta com os controles do próprio leitor de PDF do navegador. -->
+</div>
+
+<script>
+    document.getElementById('file-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(file.type === "application/pdf") {
+            // Converta o arquivo PDF selecionado em um URL de objeto
+            const objectUrl = URL.createObjectURL(file);
+            // Utilize o PDFObject para embutir o PDF
+            PDFObject.embed(objectUrl, "#pdf-viewer");
+        } else {
+            alert("Por favor, selecione um arquivo PDF.");
+        }
+    });
+</script>
+
+</body>
+</html>
