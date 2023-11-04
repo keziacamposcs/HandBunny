@@ -86,9 +86,44 @@ const GestureModule = (() => {
 const SlideModule = (() => {
     let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null;
 
-    function renderPage(num) { /*...*/ }
-    function queueRenderPage(num) { /*...*/ }
-
+    function renderPage(num)
+    {
+      pageRendering = true;
+      pdfDoc.getPage(num).then(function(page)
+      {
+        var viewport = page.getViewport({scale: scale});
+        var renderContext = {canvasContext: ctx, viewport: viewport };
+        var renderTask = page.render(renderContext);
+    
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+    
+        // Wait for rendering to finish
+        renderTask.promise.then(function()
+        {
+          pageRendering = false;
+          if (pageNumPending !== null)
+          {
+            renderPage(pageNumPending);
+            pageNumPending = null;
+          }
+        });
+      });
+      document.getElementById('page_num').textContent = num;
+    }
+    
+    function queueRenderPage(num)
+    {
+      if (pageRendering)
+      {
+        pageNumPending = num;
+      }
+      else
+      {
+        renderPage(num);
+      }
+    }
+    
     return {
         nextSlide: () => {
             if (pageNum < pdfDoc.numPages) {
