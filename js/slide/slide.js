@@ -169,22 +169,12 @@ document.getElementById('inputGroupFile').addEventListener('change', function()
   fileReader.onload = function()
   {
     var typedarray = new Uint8Array(this.result);
-    var ext = file.name.split('.').pop().toLowerCase();
-    if (ext !== 'pdf')
+    pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
     {
-      pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc_)
-      {
-        pdfDoc = pdfDoc_;
-        document.getElementById('page_count').textContent = pdfDoc.numPages;
-        renderPage(pageNum);
-      });
-    }
-    else if (['ppt', 'pptx'].includes(ext)) 
-    {
-      // Se for um arquivo do PowerPoint, exibe no Google Docs Viewer
-      var url = 'https://docs.google.com/gview?url=' + encodeURIComponent(URL.createObjectURL(file)) + '&embedded=true';
-      window.open(url, '_blank');
-    }
+      pdfDoc = pdfDoc_;
+      document.getElementById('page_count').textContent = pdfDoc.numPages;
+      renderPage(pageNum);
+    });
   };
   fileReader.readAsArrayBuffer(file);
 });
