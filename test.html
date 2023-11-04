@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visualizador de PDF com Botões de Navegação</title>
+    <style>
+        #pdf-viewer { width: 100%; height: 500px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Selecione um arquivo PDF:</h2>
+    <input type="file" id="file-input" accept="application/pdf" />
+    
+    <hr/>
+
+    <div id="pdf-viewer">
+        <!-- O PDF será exibido aqui dentro de um iframe -->
+    </div>
+
+    <!-- Botões de navegação -->
+    <button id="prev">Anterior</button>
+    <button id="next">Próximo</button>
+</div>
+
+<script>
+    let currentPDF = null;
+    let currentPage = 1;
+
+    document.getElementById('file-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file.type === "application/pdf") {
+            currentPDF = URL.createObjectURL(file);
+            currentPage = 1; // Começar do início do PDF
+            displayPage(currentPage);
+        } else {
+            alert("Por favor, selecione um arquivo PDF.");
+        }
+    });
+
+    function displayPage(page) {
+        const pdfViewer = document.getElementById('pdf-viewer');
+        pdfViewer.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.src = currentPDF + "#page=" + page;
+        iframe.style.width = '100%';
+        iframe.style.height = '500px';
+        pdfViewer.appendChild(iframe);
+    }
+
+    document.getElementById('prev').addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayPage(currentPage);
+        }
+    });
+
+    document.getElementById('next').addEventListener('click', function() {
+        // Aqui você precisa de uma maneira de verificar o número total de páginas
+        // Como o iframe não permite acesso ao conteúdo por razões de segurança, essa verificação é complicada.
+        // Você pode assumir um número máximo ou adicionar lógica para verificar o PDF de outra maneira.
+        currentPage++;
+        displayPage(currentPage);
+    });
+</script>
+
+</body>
+</html>

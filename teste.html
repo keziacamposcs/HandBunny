@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload e Visualização de Slides PPTX</title>
+</head>
+<body>
+  <input type="file" id="fileInput" />
+  <div id="presentation"></div>
+
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script>
+    const clientId = 'handbunny-394213'; // Substitua pelo ID de cliente do seu projeto
+    const apiKey = 'AIzaSyDhuClM8Yq5p0bnwYxs-1Fd-djPNWWVwMI'; // Substitua pelo seu API Key
+    const discoveryDocs = ['https://slides.googleapis.com/$discovery/rest?version=v1'];
+    const scopes = 'https://www.googleapis.com/auth/presentations.readonly';
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const content = e.target.result;
+        uploadSlides(content);
+      };
+
+      reader.readAsBinaryString(file);
+    }
+
+    function uploadSlides(content) {
+      gapi.client.init({
+        apiKey,
+        clientId,
+        discoveryDocs,
+        scope: scopes,
+      }).then(function () {
+        return gapi.client.slides.presentations.create({
+          title: 'Uploaded Presentation',
+        });
+      }).then(function (response) {
+        const presentationId = response.result.presentationId;
+        return gapi.client.slides.presentations.batchUpdate({
+          presentationId,
+          requests: [
+            {
+              createSlide: {
+                slideLayoutReference: {
+                  predefinedLayout: 'BLANK',
+                },
+              },
+            },
+            {
+              createImage: {
+                url: 'data:image/png;base64,' + btoa(content),
+                elementProperties: {
+                  pageObjectId: response.result.slides[0].objectId,
+                },
+              },
+            },
+          ],
+        });
+      }).then(function () {
+        // Embed the presentation in an iframe for display
+        const presentationDiv = document.getElementById('presentation');
+        presentationDiv.innerHTML = `<iframe src="https://docs.google.com/presentation/d/${presentationId}/embed"></iframe>`;
+      }).catch(function (error) {
+        console.error('Erro ao carregar a apresentação:', error);
+      });
+    }
+
+    document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
+  </script>
+</body>
+</html>
