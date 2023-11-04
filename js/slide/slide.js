@@ -118,43 +118,11 @@ document.getElementById('next').addEventListener('click', function() {
     currentPage++;
     displayPage(currentPage);
 });
-const renderPage = num => {
-    pageRendering = true;
-    // Usar promessa para buscar a página
-    pdfDoc.getPage(num).then(page => {
-        const viewport = page.getViewport({ scale: scale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        // Renderizar a página PDF no contexto do canvas
-        const renderContext = {
-            canvasContext: ctx,
-            viewport: viewport
-        };
-        const renderTask = page.render(renderContext);
-
-        // Aguardar o término da renderização
-        renderTask.promise.then(() => {
-            pageRendering = false;
-            if (pageNumPending !== null) {
-                // Nova renderização de página pendente
-                renderPage(pageNumPending);
-                pageNumPending = null;
-            }
-        });
-    });
-
-    // Atualizar contadores de página
-    document.getElementById('page_num').textContent = num;
-    // O contador total de páginas é definido quando o PDF é carregado
-};
-
 
 const botao_prox = document.getElementById("next");
 const botao_antes = document.getElementById("prev");
 
-let canClick = true; // Variável para controlar o delay entre cliques
-
+let canClick = true;
    const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
         const texto = mutation.target.textContent.toLowerCase();

@@ -1,5 +1,5 @@
 // =========================
-// Módulo de Desenho
+// Desenho
 // =========================
 function drawHandLandmarks(results, ctx, canvasQuadro) {
     if (results.multiHandLandmarks) {
@@ -22,7 +22,7 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
   };
   
   // =========================
-  // Módulo de Detecção de Mãos
+  // Detecção de Mãos
   // =========================
   function onResults(results, canvasCtx, canvasElement, canvasQuadro, ctx) {
     canvasCtx.save();
@@ -98,6 +98,8 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
   export const cameraModule = {
     initializeCamera
   };
+
+  
   
   // =========================
   // Event Listeners
