@@ -1,6 +1,4 @@
-// =========================
 // Desenho
-// =========================
 function drawHandLandmarks(results, ctx, canvasQuadro) {
     if (results.multiHandLandmarks) {
       for (const landmarks of results.multiHandLandmarks) {
@@ -21,9 +19,7 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
     clearCanvas
   };
   
-  // =========================
-  // Detecção de Mãos
-  // =========================
+// Detecção de Mãos
   function onResults(results, canvasCtx, canvasElement, canvasQuadro, ctx) {
     canvasCtx.save();
   
@@ -81,9 +77,7 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
     initializeHandDetection
   };
   
-  // =========================
-  // Módulo da Câmera
-  // =========================
+// Camera
   function initializeCamera(videoElement, hands) {
     const camera = new Camera(videoElement, {
       onFrame: async () => {
@@ -98,12 +92,8 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
   export const cameraModule = {
     initializeCamera
   };
-
   
-  
-  // =========================
-  // Event Listeners
-  // =========================
+// Event Listeners
   function setupEventListeners(canvasQuadro, ctx) {
     let desenhando = false;
     let x, y;
@@ -129,9 +119,7 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
     setupEventListeners
   };
   
-// =========================
 // Configurações Iniciais e Execução
-// =========================
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 const canvasCtx = canvasElement.getContext('2d');
