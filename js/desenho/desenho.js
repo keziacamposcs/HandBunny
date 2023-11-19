@@ -113,12 +113,7 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
         ctx.lineTo(x, y);
         ctx.stroke();
       }
-    });
-
-    document.querySelector('.btn-secondary').addEventListener('click', function() {
-      drawingModule.clearCanvas(canvasQuadro);
-    });
-    
+    });    
   }
   export const eventListenersModule = {
     setupEventListeners
