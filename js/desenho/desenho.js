@@ -114,6 +114,11 @@ function drawHandLandmarks(results, ctx, canvasQuadro) {
         ctx.stroke();
       }
     });
+
+    document.querySelector('.btn-secondary').addEventListener('click', function() {
+      drawingModule.clearCanvas(canvasQuadro);
+    });
+    
   }
   export const eventListenersModule = {
     setupEventListeners
